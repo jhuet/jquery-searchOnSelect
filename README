@@ -1,0 +1,42 @@
+Hides or shows the options of 1 or more select element(s) depending if they
+match or not what is typed in an input field.
+
+Requires doTimeout plugin :
+http://benalman.com/projects/jquery-dotimeout-plugin/
+
+Usage : $('#input').searchOnSelect($('#select1,#select2'));
+
+Options available (and their default values) are :
+
+options : {
+    autoSearch true,
+    flags: 'i',
+    prePatternFormat: function(pattern) {
+        return pattern;
+    },
+    preSearchFormat: function(search) {
+        return search;
+    },
+    strict: false,
+    type: 'and'
+}
+
+* autoSearch if true and a value is set in the input when the plugin is
+initialized, it will automatically do a search on it when it's loaded.
+
+* flags are the ones accepted by the RegExp constructor that is used when a
+search is made. See the RegExp documentation for possible values.
+
+* prePatternFormat is a callback method called just before using the pattern and
+to make changes on it (removing diacritics for example).
+
+* preSearchFormat is a callback method called just before using the elements to
+search on and to make changes on it (removing diacritics for example).
+
+* strict changes the way the search behaves :
+    - If true, will search for the presence of the pattern.
+    - If false, will search for the presence of the words (separated by spaces).
+
+* type also changes the way the search behaves if strict is false :
+    - If 'and', will search for the presence of all words.
+    - If 'or', will search for the presence of at least 1 of all words.

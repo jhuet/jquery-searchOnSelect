@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html xml:lang="fr" lang="fr">
+<head>
+    <title>$.searchOnSelect() Doc & Demo</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="./jquery.searchonselect.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#demo-1-input').searchOnSelect('#demo-1-select');
+            $('#demo-2-input').searchOnSelect('#demo-2-select', {type: 'or'});
+            $('#demo-3-input').searchOnSelect('#demo-3-select', {strict: true});
+            $('#demo-4-input').searchOnSelect('#demo-4-select');
+            $('#demo-5-input').searchOnSelect('#demo-5-select-1,#demo-5-select-2');
+        } );
+    </script>
+
+    <style type="text/css">
+        h1 {
+            text-align: center;
+        }
+        body {
+            font: 11px Verdana, Arial, sans-serif;
+            margin: 0 auto;
+            width: 700px;
+        }
+        .pre {
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        .demo, .doc {
+            border: 1px solid black;
+            padding: 5px;
+            margin-bottom: -1px;
+        }
+        .doc p, .doc ul {
+            margin: 7px 0;
+        }
+    </style>
+</head>
+<body>
+<!--    <a href="https://github.com/jhuet/jquery-searchonselect"><img alt="Fork me on GitHub" src="https://assets2.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61?repo=&amp;url=http%3A%2F%2Fs3.amazonaws.com%2Fgithub%2Fribbons%2Fforkme_right_white_ffffff.png&amp;path=" style="position: fixed; top: 0; right: 0; border: 0;"></a>-->
+    <h1>$.searchOnSelect() Doc & Demo</h1>
+    <div id="doc-description" class="doc">
+        <p><strong>Description</strong> : this plugin hides or shows the options of 1 or more select element(s) depending if they match or not what is typed in an input field. It will also work nicely with optgroup by searching the options concatenated with their optgroup labels.</p>
+    </div>
+    <div id="doc-options" class="doc">
+        <p><strong>Options</strong> available (and their default values) are :</p>
+        <pre>
+        options : {
+            autoSearch true,
+            flags: 'i',
+            loadDependencies: true,
+            prePatternFormat: function(pattern) {
+                return pattern;
+            },
+            preSearchFormat: function(search) {
+                return search;
+            },
+            strict: false,
+            type: 'and'
+        }</pre>
+        <ul>
+            <li>
+                <p><span class="pre"><strong>autoSearch</strong></span> if <strong>true</strong> and a value is set in the input when the plugin is initialized, it will automatically do a search on it when it's loaded.</p>
+            </li>
+            <li>
+                <p><span class="pre"><strong>flags</strong></span> are the ones accepted by the RegExp constructor that is used when a search is made. See <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/RegExp">the RegExp documentation</a> for possible values.</p>
+            </li>
+            <li>
+                <p><span class="pre"><strong>loadDependencies</strong></span> <a href="#doc-dependencies">see below</a>.</p>
+            </li>
+            <li>
+                <p><span class="pre"><strong>prePatternFormat</strong></span> is a callback method called just before using the pattern and to make changes on it (<a href="http://lehelk.com/2011/05/06/script-to-remove-diacritics/">removing diacritics</a> for example).</p>
+            </li>
+            <li>
+                <p><span class="pre"><strong>preSearchFormat</strong></span> is a callback method called just before using the elements to search on and to make changes on it (<a href="http://lehelk.com/2011/05/06/script-to-remove-diacritics/">removing diacritics</a> for example).</p>
+            </li>
+            <li>
+                <p><span class="pre"><strong>strict</strong></span> changes the way the search behaves :</p>
+                <ul>
+                    <li>If <strong>true</strong>, will search for the presence of the pattern.</li>
+                    <li>If <strong>false</strong>, will search for the presence of the words (separated by spaces).</li>
+                </ul>
+            </li>
+            <li>
+                <p><span class="pre"><strong>type</strong></span> also changes the way the search behaves if <span class="pre">strict</span> is <strong>false</strong> :</p>
+                <ul>
+                    <li>If '<strong>and</strong>', will search for the presence of all words.</li>
+                    <li>If '<strong>or</strong>', will search for the presence of at least 1 of all words.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div id="doc-default" class="doc">
+        <p>Changing <strong>default options</strong>.</p>
+        <p>You can change the default options in 2 ways that behaves exactly the same :</p>
+        <ul>
+            <li><span class="pre">$.searchOnSelect({type: 'or'});</span></li>
+            <li><span class="pre">$.searchOnSelect('options', {loadDependencies: false});</span></li>
+        </ul>
+    </div>
+    <div id="doc-events" class="doc">
+        <p><strong>Events</strong> : 2 different events are triggered by the plugin.</p>
+        <ul>
+            <li><span class="pre"><strong>loaded</strong></span> is triggered on the input when it is fully loaded (waiting for dependencies to have loaded).</li>
+            <li><span class="pre"><strong>searched</strong></span> is triggered on the input and all its select when the search is completed and the options no matching have been hidden.</li>
+        </ul>
+    </div>
+    <div id="doc-dependencies" class="doc">
+        <p><strong>Dependencies</strong> : this plugin requires <a href="http://benalman.com/projects/jquery-dotimeout-plugin/">$.doTimeout()</a> plugin and loads it automatically by default via an AJAX call. If you want to load it directly on your webpage and not load it again when this plugin is used, change the option <span class="pre">loadDependencies</span> to <strong>false</strong>.</p>
+    </div>
+    <div class="demo" id="demo-1">
+        <p><strong>Demo 1 :</strong> <strong>1</strong> input and <strong>1</strong> select.</p>
+        <label for="demo-1-input">Search in the select</label> : <input id="demo-1-input" type="text" value="11 8" />
+        <select id="demo-1-select">
+            <option label="0 100" value="0 100">0 100</option>
+            <option label="1 102" value="1 102">1 102</option>
+            <option label="2 104" value="2 104">2 104</option>
+            <option label="3 106" value="3 106">3 106</option>
+            <option label="4 108" value="4 108">4 108</option>
+            <option label="5 110" value="5 110">5 110</option>
+            <option label="6 112" value="6 112">6 112</option>
+            <option label="7 114" value="7 114">7 114</option>
+            <option label="8 116" value="8 116">8 116</option>
+            <option label="9 118" value="9 118">9 118</option>
+            <option label="10 120" value="10 120">10 120</option>
+            <option label="11 122" value="11 122">11 122</option>
+            <option label="12 124" value="12 124">12 124</option>
+            <option label="13 126" value="13 126">13 126</option>
+            <option label="14 128" value="14 128">14 128</option>
+            <option label="15 130" value="15 130">15 130</option>
+            <option label="16 132" value="16 132">16 132</option>
+            <option label="17 134" value="17 134">17 134</option>
+            <option label="18 136" value="18 136">18 136</option>
+            <option label="19 138" value="19 138">19 138</option>
+            <option label="20 140" value="20 140">20 140</option>
+            <option label="21 142" value="21 142">21 142</option>
+            <option label="22 144" value="22 144">22 144</option>
+            <option label="23 146" value="23 146">23 146</option>
+            <option label="24 148" value="24 148">24 148</option>
+            <option label="25 150" value="25 150">25 150</option>
+            <option label="26 152" value="26 152">26 152</option>
+            <option label="27 154" value="27 154">27 154</option>
+            <option label="28 156" value="28 156">28 156</option>
+            <option label="29 158" value="29 158">29 158</option>
+            <option label="30 160" value="30 160">30 160</option>
+            <option label="31 162" value="31 162">31 162</option>
+            <option label="32 164" value="32 164">32 164</option>
+            <option label="33 166" value="33 166">33 166</option>
+            <option label="34 168" value="34 168">34 168</option>
+            <option label="35 170" value="35 170">35 170</option>
+            <option label="36 172" value="36 172">36 172</option>
+            <option label="37 174" value="37 174">37 174</option>
+            <option label="38 176" value="38 176">38 176</option>
+            <option label="39 178" value="39 178">39 178</option>
+            <option label="40 180" value="40 180">40 180</option>
+            <option label="41 182" value="41 182">41 182</option>
+            <option label="42 184" value="42 184">42 184</option>
+            <option label="43 186" value="43 186">43 186</option>
+            <option label="44 188" value="44 188">44 188</option>
+            <option label="45 190" value="45 190">45 190</option>
+            <option label="46 192" value="46 192">46 192</option>
+            <option label="47 194" value="47 194">47 194</option>
+            <option label="48 196" value="48 196">48 196</option>
+            <option label="49 198" value="49 198">49 198</option>
+            <option label="50 200" value="50 200">50 200</option>
+            <option label="51 202" value="51 202">51 202</option>
+            <option label="52 204" value="52 204">52 204</option>
+            <option label="53 206" value="53 206">53 206</option>
+            <option label="54 208" value="54 208">54 208</option>
+            <option label="55 210" value="55 210">55 210</option>
+            <option label="56 212" value="56 212">56 212</option>
+            <option label="57 214" value="57 214">57 214</option>
+            <option label="58 216" value="58 216">58 216</option>
+            <option label="59 218" value="59 218">59 218</option>
+            <option label="60 220" value="60 220">60 220</option>
+            <option label="61 222" value="61 222">61 222</option>
+            <option label="62 224" value="62 224">62 224</option>
+            <option label="63 226" value="63 226">63 226</option>
+            <option label="64 228" value="64 228">64 228</option>
+            <option label="65 230" value="65 230">65 230</option>
+            <option label="66 232" value="66 232">66 232</option>
+            <option label="67 234" value="67 234">67 234</option>
+            <option label="68 236" value="68 236">68 236</option>
+            <option label="69 238" value="69 238">69 238</option>
+            <option label="70 240" value="70 240">70 240</option>
+            <option label="71 242" value="71 242">71 242</option>
+            <option label="72 244" value="72 244">72 244</option>
+            <option label="73 246" value="73 246">73 246</option>
+            <option label="74 248" value="74 248">74 248</option>
+            <option label="75 250" value="75 250">75 250</option>
+            <option label="76 252" value="76 252">76 252</option>
+            <option label="77 254" value="77 254">77 254</option>
+            <option label="78 256" value="78 256">78 256</option>
+            <option label="79 258" value="79 258">79 258</option>
+            <option label="80 260" value="80 260">80 260</option>
+            <option label="81 262" value="81 262">81 262</option>
+            <option label="82 264" value="82 264">82 264</option>
+            <option label="83 266" value="83 266">83 266</option>
+            <option label="84 268" value="84 268">84 268</option>
+            <option label="85 270" value="85 270">85 270</option>
+            <option label="86 272" value="86 272">86 272</option>
+            <option label="87 274" value="87 274">87 274</option>
+            <option label="88 276" value="88 276">88 276</option>
+            <option label="89 278" value="89 278">89 278</option>
+            <option label="90 280" value="90 280">90 280</option>
+            <option label="91 282" value="91 282">91 282</option>
+            <option label="92 284" value="92 284">92 284</option>
+            <option label="93 286" value="93 286">93 286</option>
+            <option label="94 288" value="94 288">94 288</option>
+            <option label="95 290" value="95 290">95 290</option>
+            <option label="96 292" value="96 292">96 292</option>
+            <option label="97 294" value="97 294">97 294</option>
+            <option label="98 296" value="98 296">98 296</option>
+            <option label="99 298" value="99 298">99 298</option>
+            <option label="100 300" value="100 300">100 300</option>
+        </select>
+        <p>Just call this to make it happen :</p>
+        <pre>$('#demo-1-input').searchOnSelect('#demo-1-select');</pre>
+    </div>
+    <div class="demo" id="demo-2">
+        <p><strong>Demo 2 :</strong> <strong>1</strong> input and <strong>1</strong> select but with <span class="pre">type</span> = '<strong>or</strong>'.</p>
+        <label for="demo-2-input">Search in the select</label> : <input id="demo-2-input" type="text" value="11 8" />
+        <select id="demo-2-select">
+            <option label="0 100" value="0 100">0 100</option>
+            <option label="1 102" value="1 102">1 102</option>
+            <option label="2 104" value="2 104">2 104</option>
+            <option label="3 106" value="3 106">3 106</option>
+            <option label="4 108" value="4 108">4 108</option>
+            <option label="5 110" value="5 110">5 110</option>
+            <option label="6 112" value="6 112">6 112</option>
+            <option label="7 114" value="7 114">7 114</option>
+            <option label="8 116" value="8 116">8 116</option>
+            <option label="9 118" value="9 118">9 118</option>
+            <option label="10 120" value="10 120">10 120</option>
+            <option label="11 122" value="11 122">11 122</option>
+            <option label="12 124" value="12 124">12 124</option>
+            <option label="13 126" value="13 126">13 126</option>
+            <option label="14 128" value="14 128">14 128</option>
+            <option label="15 130" value="15 130">15 130</option>
+            <option label="16 132" value="16 132">16 132</option>
+            <option label="17 134" value="17 134">17 134</option>
+            <option label="18 136" value="18 136">18 136</option>
+            <option label="19 138" value="19 138">19 138</option>
+            <option label="20 140" value="20 140">20 140</option>
+            <option label="21 142" value="21 142">21 142</option>
+            <option label="22 144" value="22 144">22 144</option>
+            <option label="23 146" value="23 146">23 146</option>
+            <option label="24 148" value="24 148">24 148</option>
+            <option label="25 150" value="25 150">25 150</option>
+            <option label="26 152" value="26 152">26 152</option>
+            <option label="27 154" value="27 154">27 154</option>
+            <option label="28 156" value="28 156">28 156</option>
+            <option label="29 158" value="29 158">29 158</option>
+            <option label="30 160" value="30 160">30 160</option>
+            <option label="31 162" value="31 162">31 162</option>
+            <option label="32 164" value="32 164">32 164</option>
+            <option label="33 166" value="33 166">33 166</option>
+            <option label="34 168" value="34 168">34 168</option>
+            <option label="35 170" value="35 170">35 170</option>
+            <option label="36 172" value="36 172">36 172</option>
+            <option label="37 174" value="37 174">37 174</option>
+            <option label="38 176" value="38 176">38 176</option>
+            <option label="39 178" value="39 178">39 178</option>
+            <option label="40 180" value="40 180">40 180</option>
+            <option label="41 182" value="41 182">41 182</option>
+            <option label="42 184" value="42 184">42 184</option>
+            <option label="43 186" value="43 186">43 186</option>
+            <option label="44 188" value="44 188">44 188</option>
+            <option label="45 190" value="45 190">45 190</option>
+            <option label="46 192" value="46 192">46 192</option>
+            <option label="47 194" value="47 194">47 194</option>
+            <option label="48 196" value="48 196">48 196</option>
+            <option label="49 198" value="49 198">49 198</option>
+            <option label="50 200" value="50 200">50 200</option>
+            <option label="51 202" value="51 202">51 202</option>
+            <option label="52 204" value="52 204">52 204</option>
+            <option label="53 206" value="53 206">53 206</option>
+            <option label="54 208" value="54 208">54 208</option>
+            <option label="55 210" value="55 210">55 210</option>
+            <option label="56 212" value="56 212">56 212</option>
+            <option label="57 214" value="57 214">57 214</option>
+            <option label="58 216" value="58 216">58 216</option>
+            <option label="59 218" value="59 218">59 218</option>
+            <option label="60 220" value="60 220">60 220</option>
+            <option label="61 222" value="61 222">61 222</option>
+            <option label="62 224" value="62 224">62 224</option>
+            <option label="63 226" value="63 226">63 226</option>
+            <option label="64 228" value="64 228">64 228</option>
+            <option label="65 230" value="65 230">65 230</option>
+            <option label="66 232" value="66 232">66 232</option>
+            <option label="67 234" value="67 234">67 234</option>
+            <option label="68 236" value="68 236">68 236</option>
+            <option label="69 238" value="69 238">69 238</option>
+            <option label="70 240" value="70 240">70 240</option>
+            <option label="71 242" value="71 242">71 242</option>
+            <option label="72 244" value="72 244">72 244</option>
+            <option label="73 246" value="73 246">73 246</option>
+            <option label="74 248" value="74 248">74 248</option>
+            <option label="75 250" value="75 250">75 250</option>
+            <option label="76 252" value="76 252">76 252</option>
+            <option label="77 254" value="77 254">77 254</option>
+            <option label="78 256" value="78 256">78 256</option>
+            <option label="79 258" value="79 258">79 258</option>
+            <option label="80 260" value="80 260">80 260</option>
+            <option label="81 262" value="81 262">81 262</option>
+            <option label="82 264" value="82 264">82 264</option>
+            <option label="83 266" value="83 266">83 266</option>
+            <option label="84 268" value="84 268">84 268</option>
+            <option label="85 270" value="85 270">85 270</option>
+            <option label="86 272" value="86 272">86 272</option>
+            <option label="87 274" value="87 274">87 274</option>
+            <option label="88 276" value="88 276">88 276</option>
+            <option label="89 278" value="89 278">89 278</option>
+            <option label="90 280" value="90 280">90 280</option>
+            <option label="91 282" value="91 282">91 282</option>
+            <option label="92 284" value="92 284">92 284</option>
+            <option label="93 286" value="93 286">93 286</option>
+            <option label="94 288" value="94 288">94 288</option>
+            <option label="95 290" value="95 290">95 290</option>
+            <option label="96 292" value="96 292">96 292</option>
+            <option label="97 294" value="97 294">97 294</option>
+            <option label="98 296" value="98 296">98 296</option>
+            <option label="99 298" value="99 298">99 298</option>
+            <option label="100 300" value="100 300">100 300</option>
+        </select>
+        <p>Just call this to make it happen :</p>
+        <pre>$('#demo-2-input').searchOnSelect('#demo-2-select', {type: 'or'});</pre>
+    </div>
+    <div class="demo" id="demo-3">
+        <p><strong>Demo 3 :</strong> <strong>strict</strong> search.</p>
+        <label for="demo-3-input">Search exactly for</label> : <input id="demo-3-input" type="text" value="11 1" />
+        <select id="demo-3-select">
+            <option label="0 100" value="0 100">0 100</option>
+            <option label="1 102" value="1 102">1 102</option>
+            <option label="2 104" value="2 104">2 104</option>
+            <option label="3 106" value="3 106">3 106</option>
+            <option label="4 108" value="4 108">4 108</option>
+            <option label="5 110" value="5 110">5 110</option>
+            <option label="6 112" value="6 112">6 112</option>
+            <option label="7 114" value="7 114">7 114</option>
+            <option label="8 116" value="8 116">8 116</option>
+            <option label="9 118" value="9 118">9 118</option>
+            <option label="10 120" value="10 120">10 120</option>
+            <option label="11 122" value="11 122">11 122</option>
+            <option label="12 124" value="12 124">12 124</option>
+            <option label="13 126" value="13 126">13 126</option>
+            <option label="14 128" value="14 128">14 128</option>
+            <option label="15 130" value="15 130">15 130</option>
+            <option label="16 132" value="16 132">16 132</option>
+            <option label="17 134" value="17 134">17 134</option>
+            <option label="18 136" value="18 136">18 136</option>
+            <option label="19 138" value="19 138">19 138</option>
+            <option label="20 140" value="20 140">20 140</option>
+            <option label="21 142" value="21 142">21 142</option>
+            <option label="22 144" value="22 144">22 144</option>
+            <option label="23 146" value="23 146">23 146</option>
+            <option label="24 148" value="24 148">24 148</option>
+            <option label="25 150" value="25 150">25 150</option>
+            <option label="26 152" value="26 152">26 152</option>
+            <option label="27 154" value="27 154">27 154</option>
+            <option label="28 156" value="28 156">28 156</option>
+            <option label="29 158" value="29 158">29 158</option>
+            <option label="30 160" value="30 160">30 160</option>
+            <option label="31 162" value="31 162">31 162</option>
+            <option label="32 164" value="32 164">32 164</option>
+            <option label="33 166" value="33 166">33 166</option>
+            <option label="34 168" value="34 168">34 168</option>
+            <option label="35 170" value="35 170">35 170</option>
+            <option label="36 172" value="36 172">36 172</option>
+            <option label="37 174" value="37 174">37 174</option>
+            <option label="38 176" value="38 176">38 176</option>
+            <option label="39 178" value="39 178">39 178</option>
+            <option label="40 180" value="40 180">40 180</option>
+            <option label="41 182" value="41 182">41 182</option>
+            <option label="42 184" value="42 184">42 184</option>
+            <option label="43 186" value="43 186">43 186</option>
+            <option label="44 188" value="44 188">44 188</option>
+            <option label="45 190" value="45 190">45 190</option>
+            <option label="46 192" value="46 192">46 192</option>
+            <option label="47 194" value="47 194">47 194</option>
+            <option label="48 196" value="48 196">48 196</option>
+            <option label="49 198" value="49 198">49 198</option>
+            <option label="50 200" value="50 200">50 200</option>
+            <option label="51 202" value="51 202">51 202</option>
+            <option label="52 204" value="52 204">52 204</option>
+            <option label="53 206" value="53 206">53 206</option>
+            <option label="54 208" value="54 208">54 208</option>
+            <option label="55 210" value="55 210">55 210</option>
+            <option label="56 212" value="56 212">56 212</option>
+            <option label="57 214" value="57 214">57 214</option>
+            <option label="58 216" value="58 216">58 216</option>
+            <option label="59 218" value="59 218">59 218</option>
+            <option label="60 220" value="60 220">60 220</option>
+            <option label="61 222" value="61 222">61 222</option>
+            <option label="62 224" value="62 224">62 224</option>
+            <option label="63 226" value="63 226">63 226</option>
+            <option label="64 228" value="64 228">64 228</option>
+            <option label="65 230" value="65 230">65 230</option>
+            <option label="66 232" value="66 232">66 232</option>
+            <option label="67 234" value="67 234">67 234</option>
+            <option label="68 236" value="68 236">68 236</option>
+            <option label="69 238" value="69 238">69 238</option>
+            <option label="70 240" value="70 240">70 240</option>
+            <option label="71 242" value="71 242">71 242</option>
+            <option label="72 244" value="72 244">72 244</option>
+            <option label="73 246" value="73 246">73 246</option>
+            <option label="74 248" value="74 248">74 248</option>
+            <option label="75 250" value="75 250">75 250</option>
+            <option label="76 252" value="76 252">76 252</option>
+            <option label="77 254" value="77 254">77 254</option>
+            <option label="78 256" value="78 256">78 256</option>
+            <option label="79 258" value="79 258">79 258</option>
+            <option label="80 260" value="80 260">80 260</option>
+            <option label="81 262" value="81 262">81 262</option>
+            <option label="82 264" value="82 264">82 264</option>
+            <option label="83 266" value="83 266">83 266</option>
+            <option label="84 268" value="84 268">84 268</option>
+            <option label="85 270" value="85 270">85 270</option>
+            <option label="86 272" value="86 272">86 272</option>
+            <option label="87 274" value="87 274">87 274</option>
+            <option label="88 276" value="88 276">88 276</option>
+            <option label="89 278" value="89 278">89 278</option>
+            <option label="90 280" value="90 280">90 280</option>
+            <option label="91 282" value="91 282">91 282</option>
+            <option label="92 284" value="92 284">92 284</option>
+            <option label="93 286" value="93 286">93 286</option>
+            <option label="94 288" value="94 288">94 288</option>
+            <option label="95 290" value="95 290">95 290</option>
+            <option label="96 292" value="96 292">96 292</option>
+            <option label="97 294" value="97 294">97 294</option>
+            <option label="98 296" value="98 296">98 296</option>
+            <option label="99 298" value="99 298">99 298</option>
+            <option label="100 300" value="100 300">100 300</option>
+        </select>
+        <p>Just call this to make it happen :</p>
+        <pre>$('#demo-3-input').searchOnSelect('#demo-3-select', {strict:true});</pre>
+    </div>
+    <div class="demo" id="demo-4">
+        <p><strong>Demo 4 :</strong> search in <strong>optgroup</strong>.</p>
+        <label for="demo-4-input">Will search in both options and optgroup labels</label> : <input id="demo-4-input" type="text" value="6" />
+        <select id="demo-4-select">
+            <optgroup label="1 to 10">
+                <option value="1" label="1">1</option>
+                <option value="2" label="2">2</option>
+                <option value="3" label="3">3</option>
+                <option value="4" label="4">4</option>
+                <option value="5" label="5">5</option>
+                <option value="6" label="6">6</option>
+                <option value="7" label="7">7</option>
+                <option value="8" label="8">8</option>
+                <option value="9" label="9">9</option>
+                <option value="10" label="10">10</option>
+            </optgroup>
+            <optgroup label="11 to 20">
+                <option value="11" label="11">11</option>
+                <option value="12" label="12">12</option>
+                <option value="13" label="13">13</option>
+                <option value="14" label="14">14</option>
+                <option value="15" label="15">15</option>
+                <option value="16" label="16">16</option>
+                <option value="17" label="17">17</option>
+                <option value="18" label="18">18</option>
+                <option value="19" label="19">19</option>
+                <option value="20" label="20">20</option>
+            </optgroup>
+            <optgroup label="21 to 30">
+                <option value="21" label="21">21</option>
+                <option value="22" label="22">22</option>
+                <option value="23" label="23">23</option>
+                <option value="24" label="24">24</option>
+                <option value="25" label="25">25</option>
+                <option value="26" label="26">26</option>
+                <option value="27" label="27">27</option>
+                <option value="28" label="28">28</option>
+                <option value="29" label="29">29</option>
+                <option value="30" label="30">30</option>
+            </optgroup>
+            <optgroup label="31 to 40">
+                <option value="31" label="31">31</option>
+                <option value="32" label="32">32</option>
+                <option value="33" label="33">33</option>
+                <option value="34" label="34">34</option>
+                <option value="35" label="35">35</option>
+                <option value="36" label="36">36</option>
+                <option value="37" label="37">37</option>
+                <option value="38" label="38">38</option>
+                <option value="39" label="39">39</option>
+                <option value="40" label="40">40</option>
+            </optgroup>
+            <optgroup label="41 to 50">
+                <option value="41" label="41">41</option>
+                <option value="42" label="42">42</option>
+                <option value="43" label="43">43</option>
+                <option value="44" label="44">44</option>
+                <option value="45" label="45">45</option>
+                <option value="46" label="46">46</option>
+                <option value="47" label="47">47</option>
+                <option value="48" label="48">48</option>
+                <option value="49" label="49">49</option>
+                <option value="50" label="50">50</option>
+            </optgroup>
+            <optgroup label="51 to 60">
+                <option value="51" label="51">51</option>
+                <option value="52" label="52">52</option>
+                <option value="53" label="53">53</option>
+                <option value="54" label="54">54</option>
+                <option value="55" label="55">55</option>
+                <option value="56" label="56">56</option>
+                <option value="57" label="57">57</option>
+                <option value="58" label="58">58</option>
+                <option value="59" label="59">59</option>
+                <option value="60" label="60">60</option>
+            </optgroup>
+            <optgroup label="61 to 70">
+                <option value="61" label="61">61</option>
+                <option value="62" label="62">62</option>
+                <option value="63" label="63">63</option>
+                <option value="64" label="64">64</option>
+                <option value="65" label="65">65</option>
+                <option value="66" label="66">66</option>
+                <option value="67" label="67">67</option>
+                <option value="68" label="68">68</option>
+                <option value="69" label="69">69</option>
+                <option value="70" label="70">70</option>
+            </optgroup>
+            <optgroup label="71 to 80">
+                <option value="71" label="71">71</option>
+                <option value="72" label="72">72</option>
+                <option value="73" label="73">73</option>
+                <option value="74" label="74">74</option>
+                <option value="75" label="75">75</option>
+                <option value="76" label="76">76</option>
+                <option value="77" label="77">77</option>
+                <option value="78" label="78">78</option>
+                <option value="79" label="79">79</option>
+                <option value="80" label="80">80</option>
+            </optgroup>
+            <optgroup label="81 to 90">
+                <option value="81" label="81">81</option>
+                <option value="82" label="82">82</option>
+                <option value="83" label="83">83</option>
+                <option value="84" label="84">84</option>
+                <option value="85" label="85">85</option>
+                <option value="86" label="86">86</option>
+                <option value="87" label="87">87</option>
+                <option value="88" label="88">88</option>
+                <option value="89" label="89">89</option>
+                <option value="90" label="90">90</option>
+            </optgroup>
+            <optgroup label="91 to 100">
+                <option value="91" label="91">91</option>
+                <option value="92" label="92">92</option>
+                <option value="93" label="93">93</option>
+                <option value="94" label="94">94</option>
+                <option value="95" label="95">95</option>
+                <option value="96" label="96">96</option>
+                <option value="97" label="97">97</option>
+                <option value="98" label="98">98</option>
+                <option value="99" label="99">99</option>
+                <option value="100" label="100">100</option>
+            </optgroup>
+        </select>
+        <p>Just call this to make it happen :</p>
+        <pre>$('#demo-4-input').searchOnSelect('#demo-4-select');</pre>
+    </div>
+    <div class="demo" id="demo-5">
+        <p><strong>Demo 5 :</strong> <strong>1</strong> input and <strong>2</strong> select.</p>
+        <label for="demo-5-input">Search in both select</label> : <input id="demo-5-input" type="text" value="10 5" />
+        <select id="demo-5-select-1">
+            <option label="0 100" value="0 100">0 100</option>
+            <option label="1 102" value="1 102">1 102</option>
+            <option label="2 104" value="2 104">2 104</option>
+            <option label="3 106" value="3 106">3 106</option>
+            <option label="4 108" value="4 108">4 108</option>
+            <option label="5 110" value="5 110">5 110</option>
+            <option label="6 112" value="6 112">6 112</option>
+            <option label="7 114" value="7 114">7 114</option>
+            <option label="8 116" value="8 116">8 116</option>
+            <option label="9 118" value="9 118">9 118</option>
+            <option label="10 120" value="10 120">10 120</option>
+            <option label="11 122" value="11 122">11 122</option>
+            <option label="12 124" value="12 124">12 124</option>
+            <option label="13 126" value="13 126">13 126</option>
+            <option label="14 128" value="14 128">14 128</option>
+            <option label="15 130" value="15 130">15 130</option>
+            <option label="16 132" value="16 132">16 132</option>
+            <option label="17 134" value="17 134">17 134</option>
+            <option label="18 136" value="18 136">18 136</option>
+            <option label="19 138" value="19 138">19 138</option>
+            <option label="20 140" value="20 140">20 140</option>
+            <option label="21 142" value="21 142">21 142</option>
+            <option label="22 144" value="22 144">22 144</option>
+            <option label="23 146" value="23 146">23 146</option>
+            <option label="24 148" value="24 148">24 148</option>
+            <option label="25 150" value="25 150">25 150</option>
+            <option label="26 152" value="26 152">26 152</option>
+            <option label="27 154" value="27 154">27 154</option>
+            <option label="28 156" value="28 156">28 156</option>
+            <option label="29 158" value="29 158">29 158</option>
+            <option label="30 160" value="30 160">30 160</option>
+            <option label="31 162" value="31 162">31 162</option>
+            <option label="32 164" value="32 164">32 164</option>
+            <option label="33 166" value="33 166">33 166</option>
+            <option label="34 168" value="34 168">34 168</option>
+            <option label="35 170" value="35 170">35 170</option>
+            <option label="36 172" value="36 172">36 172</option>
+            <option label="37 174" value="37 174">37 174</option>
+            <option label="38 176" value="38 176">38 176</option>
+            <option label="39 178" value="39 178">39 178</option>
+            <option label="40 180" value="40 180">40 180</option>
+            <option label="41 182" value="41 182">41 182</option>
+            <option label="42 184" value="42 184">42 184</option>
+            <option label="43 186" value="43 186">43 186</option>
+            <option label="44 188" value="44 188">44 188</option>
+            <option label="45 190" value="45 190">45 190</option>
+            <option label="46 192" value="46 192">46 192</option>
+            <option label="47 194" value="47 194">47 194</option>
+            <option label="48 196" value="48 196">48 196</option>
+            <option label="49 198" value="49 198">49 198</option>
+            <option label="50 200" value="50 200">50 200</option>
+            <option label="51 202" value="51 202">51 202</option>
+            <option label="52 204" value="52 204">52 204</option>
+            <option label="53 206" value="53 206">53 206</option>
+            <option label="54 208" value="54 208">54 208</option>
+            <option label="55 210" value="55 210">55 210</option>
+            <option label="56 212" value="56 212">56 212</option>
+            <option label="57 214" value="57 214">57 214</option>
+            <option label="58 216" value="58 216">58 216</option>
+            <option label="59 218" value="59 218">59 218</option>
+            <option label="60 220" value="60 220">60 220</option>
+            <option label="61 222" value="61 222">61 222</option>
+            <option label="62 224" value="62 224">62 224</option>
+            <option label="63 226" value="63 226">63 226</option>
+            <option label="64 228" value="64 228">64 228</option>
+            <option label="65 230" value="65 230">65 230</option>
+            <option label="66 232" value="66 232">66 232</option>
+            <option label="67 234" value="67 234">67 234</option>
+            <option label="68 236" value="68 236">68 236</option>
+            <option label="69 238" value="69 238">69 238</option>
+            <option label="70 240" value="70 240">70 240</option>
+            <option label="71 242" value="71 242">71 242</option>
+            <option label="72 244" value="72 244">72 244</option>
+            <option label="73 246" value="73 246">73 246</option>
+            <option label="74 248" value="74 248">74 248</option>
+            <option label="75 250" value="75 250">75 250</option>
+            <option label="76 252" value="76 252">76 252</option>
+            <option label="77 254" value="77 254">77 254</option>
+            <option label="78 256" value="78 256">78 256</option>
+            <option label="79 258" value="79 258">79 258</option>
+            <option label="80 260" value="80 260">80 260</option>
+            <option label="81 262" value="81 262">81 262</option>
+            <option label="82 264" value="82 264">82 264</option>
+            <option label="83 266" value="83 266">83 266</option>
+            <option label="84 268" value="84 268">84 268</option>
+            <option label="85 270" value="85 270">85 270</option>
+            <option label="86 272" value="86 272">86 272</option>
+            <option label="87 274" value="87 274">87 274</option>
+            <option label="88 276" value="88 276">88 276</option>
+            <option label="89 278" value="89 278">89 278</option>
+            <option label="90 280" value="90 280">90 280</option>
+            <option label="91 282" value="91 282">91 282</option>
+            <option label="92 284" value="92 284">92 284</option>
+            <option label="93 286" value="93 286">93 286</option>
+            <option label="94 288" value="94 288">94 288</option>
+            <option label="95 290" value="95 290">95 290</option>
+            <option label="96 292" value="96 292">96 292</option>
+            <option label="97 294" value="97 294">97 294</option>
+            <option label="98 296" value="98 296">98 296</option>
+            <option label="99 298" value="99 298">99 298</option>
+            <option label="100 300" value="100 300">100 300</option>
+        </select>
+        <select id="demo-5-select-2">
+            <option value="200 300" label="200 300">200 300</option>
+            <option value="201 302" label="201 302">201 302</option>
+            <option value="202 304" label="202 304">202 304</option>
+            <option value="203 306" label="203 306">203 306</option>
+            <option value="204 308" label="204 308">204 308</option>
+            <option value="205 310" label="205 310">205 310</option>
+            <option value="206 312" label="206 312">206 312</option>
+            <option value="207 314" label="207 314">207 314</option>
+            <option value="208 316" label="208 316">208 316</option>
+            <option value="209 318" label="209 318">209 318</option>
+            <option value="210 320" label="210 320">210 320</option>
+            <option value="211 322" label="211 322">211 322</option>
+            <option value="212 324" label="212 324">212 324</option>
+            <option value="213 326" label="213 326">213 326</option>
+            <option value="214 328" label="214 328">214 328</option>
+            <option value="215 330" label="215 330">215 330</option>
+            <option value="216 332" label="216 332">216 332</option>
+            <option value="217 334" label="217 334">217 334</option>
+            <option value="218 336" label="218 336">218 336</option>
+            <option value="219 338" label="219 338">219 338</option>
+            <option value="220 340" label="220 340">220 340</option>
+            <option value="221 342" label="221 342">221 342</option>
+            <option value="222 344" label="222 344">222 344</option>
+            <option value="223 346" label="223 346">223 346</option>
+            <option value="224 348" label="224 348">224 348</option>
+            <option value="225 350" label="225 350">225 350</option>
+            <option value="226 352" label="226 352">226 352</option>
+            <option value="227 354" label="227 354">227 354</option>
+            <option value="228 356" label="228 356">228 356</option>
+            <option value="229 358" label="229 358">229 358</option>
+            <option value="230 360" label="230 360">230 360</option>
+            <option value="231 362" label="231 362">231 362</option>
+            <option value="232 364" label="232 364">232 364</option>
+            <option value="233 366" label="233 366">233 366</option>
+            <option value="234 368" label="234 368">234 368</option>
+            <option value="235 370" label="235 370">235 370</option>
+            <option value="236 372" label="236 372">236 372</option>
+            <option value="237 374" label="237 374">237 374</option>
+            <option value="238 376" label="238 376">238 376</option>
+            <option value="239 378" label="239 378">239 378</option>
+            <option value="240 380" label="240 380">240 380</option>
+            <option value="241 382" label="241 382">241 382</option>
+            <option value="242 384" label="242 384">242 384</option>
+            <option value="243 386" label="243 386">243 386</option>
+            <option value="244 388" label="244 388">244 388</option>
+            <option value="245 390" label="245 390">245 390</option>
+            <option value="246 392" label="246 392">246 392</option>
+            <option value="247 394" label="247 394">247 394</option>
+            <option value="248 396" label="248 396">248 396</option>
+            <option value="249 398" label="249 398">249 398</option>
+            <option value="250 400" label="250 400">250 400</option>
+            <option value="251 402" label="251 402">251 402</option>
+            <option value="252 404" label="252 404">252 404</option>
+            <option value="253 406" label="253 406">253 406</option>
+            <option value="254 408" label="254 408">254 408</option>
+            <option value="255 410" label="255 410">255 410</option>
+            <option value="256 412" label="256 412">256 412</option>
+            <option value="257 414" label="257 414">257 414</option>
+            <option value="258 416" label="258 416">258 416</option>
+            <option value="259 418" label="259 418">259 418</option>
+            <option value="260 420" label="260 420">260 420</option>
+            <option value="261 422" label="261 422">261 422</option>
+            <option value="262 424" label="262 424">262 424</option>
+            <option value="263 426" label="263 426">263 426</option>
+            <option value="264 428" label="264 428">264 428</option>
+            <option value="265 430" label="265 430">265 430</option>
+            <option value="266 432" label="266 432">266 432</option>
+            <option value="267 434" label="267 434">267 434</option>
+            <option value="268 436" label="268 436">268 436</option>
+            <option value="269 438" label="269 438">269 438</option>
+            <option value="270 440" label="270 440">270 440</option>
+            <option value="271 442" label="271 442">271 442</option>
+            <option value="272 444" label="272 444">272 444</option>
+            <option value="273 446" label="273 446">273 446</option>
+            <option value="274 448" label="274 448">274 448</option>
+            <option value="275 450" label="275 450">275 450</option>
+            <option value="276 452" label="276 452">276 452</option>
+            <option value="277 454" label="277 454">277 454</option>
+            <option value="278 456" label="278 456">278 456</option>
+            <option value="279 458" label="279 458">279 458</option>
+            <option value="280 460" label="280 460">280 460</option>
+            <option value="281 462" label="281 462">281 462</option>
+            <option value="282 464" label="282 464">282 464</option>
+            <option value="283 466" label="283 466">283 466</option>
+            <option value="284 468" label="284 468">284 468</option>
+            <option value="285 470" label="285 470">285 470</option>
+            <option value="286 472" label="286 472">286 472</option>
+            <option value="287 474" label="287 474">287 474</option>
+            <option value="288 476" label="288 476">288 476</option>
+            <option value="289 478" label="289 478">289 478</option>
+            <option value="290 480" label="290 480">290 480</option>
+            <option value="291 482" label="291 482">291 482</option>
+            <option value="292 484" label="292 484">292 484</option>
+            <option value="293 486" label="293 486">293 486</option>
+            <option value="294 488" label="294 488">294 488</option>
+            <option value="295 490" label="295 490">295 490</option>
+            <option value="296 492" label="296 492">296 492</option>
+            <option value="297 494" label="297 494">297 494</option>
+            <option value="298 496" label="298 496">298 496</option>
+            <option value="299 498" label="299 498">299 498</option>
+            <option value="300 500" label="300 500">300 500</option>
+        </select>
+        <p>Just call this to make it happen :</p>
+        <pre>$('#demo-5-input').searchOnSelect('#demo-5-select-1,#demo-5-select-2');</pre>
+    </div>
+</body>
+</html>
